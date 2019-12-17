@@ -1,8 +1,10 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Google Calendar API Quickstart</title>
-    <meta charset="utf-8" />
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 
 <link rel="stylesheet"
@@ -21,6 +23,13 @@
 	height: 40px !important;
 	background-color: #ed4d67 !important;
 }
+.big_button:hover {
+	background-color: #bf263f !important;
+}
+
+.big_button:active {
+	background-color: #f7657d !important;
+}
 
  </style>
   <body>
@@ -29,30 +38,21 @@
 	<div class="card mb-4 ">
 		<div class="card-header text-center h4">Google Calendar API Quickstart</div>
 		<div class="card-body">
-		<button id="authorize_button" type="button" style="display: none;" class=" btn  big_button rounded-0  font-weight-bold mb-2">Sign In</button>
-	 	<button type="button" class="btn big_button rounded-0  font-weight-bold" style="display: none;" id="event_button">View Events</button>
-			
-				<div class="card mt-2" style="width: 400px;display: none;" id="preview_content">
-					<div class="card-body">
-					<div class="d-flex align-items-center">
-					<div id="content" style="white-space: pre-wrap;" class="text-break"></div>
-						<button type="button" class="btn btn-outline-primary ml-auto" style="height:40px"  data-toggle="modal" data-target="#exampleModal">Edit</button>
-					</div>
-					</div>
-				</div>
+	 	<button type="button" class="btn big_button rounded-0  mb-4 font-weight-bold"   id="view_button">View Events</button>
+	 	<button type="button" class="btn big_button rounded-0  mb-4  font-weight-bold float-right"  id="creat_btn"   data-toggle="modal" data-target="#createModal">Create New Event</button>
+		<ul class="list-group" id="event_container" style="display: none;">
 
+		</ul>
 			</div>
 	</div>
 	
-	<ul class="list-group" id="event_container">
 
-</ul>
 	<div class="d-flex">
-	<button id="signout_button" style="display: none;" type="button" class=" btn  big_button rounded-0 font-weight-bold ">Sign Out</button>
+	<button id="signout_button" type="button" class=" btn  big_button rounded-0 font-weight-bold ">Sign Out</button>
 	</div>
 	
 
-<!-- Modal -->
+<!-- Modal For update event -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog  modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -64,10 +64,6 @@
       </div>
       <div class="modal-body" data-event=" ">
         <form>
-  <div class="form-group">
-    <label for="exampleFormControlInput1">calendar Id(Email)</label>
-    <input type="email" class="form-control" id="calendarid" placeholder="type here">
-  </div>
   <div class="form-group">
   <!--   <label for="exampleFormControlSelect1">event Id</label> -->
    <input type="hidden" class="form-control" id="eventId" placeholder="type here">
@@ -93,32 +89,71 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" onclick=storevalue() data-dismiss="modal">Save changes</button>
+       
       </div>
     </div>
   </div>
 </div>
+	<!--end Modal For update event -->
 	
+<!--Start Modal For create event -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create Events</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" data-createevent=" " id="create_event_body">
+        <form>
+  <div class="form-group">
+  <!--   <label for="exampleFormControlSelect1">event Id</label> -->
+   <input type="hidden" class="form-control" id="eventId" placeholder="type here">
+  </div>
+  <div class="form-group">
+  <label for="exampleFormControlSelect1">Summary</label>
+   <input type="text" class="form-control" id="create_summary" placeholder="type here">
+  </div>
+ <div class="form-group">
+  <label for="exampleFormControlSelect1">Start date Time</label>
+  
+   <input type="datetime-local" class="form-control" id="create_start_date" placeholder="type here" value="">
+  </div>
+  <div class="form-group">
+ <label for="exampleFormControlSelect1">End date Time</label>
+   <input type="datetime-local" class="form-control" id="create_end_date" placeholder="type here">
+  </div>
+  <div class="form-group">
+    <label for="exampleFormControlTextarea1">Update description</label>
+    <textarea class="form-control" id="create_description" rows="3"></textarea>
+  </div>
+</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="createevent()">Create Event</button>
+      </div>
+    </div>
+  </div>
+</div>
+	<!--end Modal For Create event -->
  </div>
   <script>
+  
+  /* Start of Update event function */
   function storevalue(){
-	 /*  var desc =document.getElementById("description").value();
-	  var summary =document.getElementById("summary").value(); */
-	  var startDate =$('#startdate').val();
-/* 	  var endDate =document.getElementById("enddate").value();
- */	 var event=JSON.parse($('.modal-body').attr('data-event'));
+	 var event=JSON.parse($('.modal-body').attr('data-event'));
 	 var new_start_date= new Date($('#startdate').val());
 	 var new_end_date= new Date($('#enddate').val());
-
-	 console.log(event)
-
-	event.start={dateTime:ISODateString(new_start_date)};
-		event.end={dateTime:ISODateString(new_end_date)};
-
-	 
+	 var desc =$('#description').val();
+	 var summary =$('#summary').val();
+	 event.start={dateTime:ISODateString(new_start_date)};
+	 event.end={dateTime:ISODateString(new_end_date)};
+	 event.description=desc;
+	 event.summary=summary;
 	 console.log(event);
-	 
-	 
-	 
 	 var request = gapi.client.calendar.events.update({
 		  'calendarId': 'primary',
 		  'eventId':event.id,
@@ -129,6 +164,30 @@
 		  appendPre('Event created: ' + event.htmlLink);
 		});
   }
+  
+  /* Start of create new event function */
+  function createevent(){
+		 //var event=$("#create_event_body").attr("data-createevent");
+		 var event={};
+		 console.log(event);
+		  var start_date= new Date($('#create_start_date').val());
+		 var end_date= new Date($('#create_end_date').val());
+		 var descr =$('#create_description').val();
+		 var summary1 =$('#create_summary').val();
+		 event.start={dateTime:ISODateString(start_date)};
+		 event.end={dateTime:ISODateString(end_date)};
+		 event.description=descr;
+		 event.summary=summary1;
+		 
+		 var request = gapi.client.calendar.events.insert({
+			  'calendarId': 'primary',
+			  'resource': event
+			});
+			 request.execute(function(event) {
+				 console.log(event)
+			 // appendPre('Event created: ' + event.htmlLink);
+			});  
+	  }
   </script>
   
   
@@ -150,7 +209,6 @@
       // included, separated by spaces.
       var SCOPES ="https://www.googleapis.com/auth/calendar";
 
-      var authorizeButton = document.getElementById('authorize_button');
       var signoutButton = document.getElementById('signout_button');
 
       /**
@@ -176,7 +234,7 @@
 
           // Handle the initial sign-in state.
           updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-          authorizeButton.onclick = handleAuthClick;
+         
           signoutButton.onclick = handleSignoutClick;
         }, function(error) {
           appendPre(JSON.stringify(error, null, 2));
@@ -189,50 +247,27 @@
        */
       function updateSigninStatus(isSignedIn) {
         if (isSignedIn) {
-
-          authorizeButton.style.display = 'none';
- 		  $('#event_button').show();
           signoutButton.style.display = 'block';
           listUpcomingEvents();
         } else {
-          authorizeButton.style.display = 'block';
-          signoutButton.style.display = 'none';
+         /*  authorizeButton.style.display = 'block';
+          signoutButton.style.display = 'none'; */
         }
       }
-      $('#event_button').click(function(){
-    	   $('#preview_content').show();
+      $('#view_button').click(function(){
+    	   $('#event_container').show();
     	});
    
-      /**
-       *  Sign in the user upon button click.
-       */
-      function handleAuthClick(event) {
-        gapi.auth2.getAuthInstance().signIn();
-        
-      }
+    
 
       /**
        *  Sign out the user upon button click.
        */
       function handleSignoutClick(event) {
         gapi.auth2.getAuthInstance().signOut();
-        $('#event_button').hide();
-        $('#preview_content').hide();
+        location.href=location.protocol+"//"+location.host+"/google-Calendar-JavaScript/login_page.jsp"
       }
-
-      /**
-       * Append a pre element to the body containing the given message
-       * as its text node. Used to display the results of the API call.
-       *
-       * @param {string} message Text to be placed in pre element.
-       */
-      function appendPre(message) {
-        var pre = document.getElementById('content');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
-      }
-   
-      /**
+   /**
        * Print the summary and start datetime/date of the next ten events in
        * the authorized user's calendar. If no events are found an
        * appropriate message is printed.
@@ -253,7 +288,8 @@
 					event.htmlLink=""
 						event.summary=event.summary;
 					var eventStr=JSON.stringify(event).replace(/\s+/g, '_');
-					$('#event_container').append(" <li class='list-group-item'>"+event.summary+"<button type='button' class='btn btn-outline-dark float-right' data-eventobj="+eventStr+" onclick='editEvent(this)'>Dark</button></li>");
+					$("#create_event_body").attr("data-Createevent",eventStr);
+					$('#event_container').append(" <li class='list-group-item'>"+event.summary+'<br>'+event.start.dateTime+'<br>'+event.description+"<button type='button' class='btn btn-outline-dark float-right' data-eventobj="+eventStr+" onclick='editEvent(this)'>Edit</button></li>");
 				}
 			}   else{
 				alert('No Events')
@@ -266,11 +302,11 @@
       function editEvent(button){
     	  var event = $(button).data('eventobj');
     	  console.log(event)
-$('.modal-body').attr('data-event',JSON.stringify(event));
+		$('.modal-body').attr('data-event',JSON.stringify(event));
     	  $('#exampleModal').modal('show')
       }
-      
-      
+     
+   
       
       function ISODateString(d){
     	  function pad(n){return n<10 ? '0'+n : n}
