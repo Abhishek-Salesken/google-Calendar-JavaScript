@@ -161,7 +161,7 @@
 		});
 
 		request.execute(function(event) {
-		  appendPre('Event created: ' + event.htmlLink);
+		  appendPre('Event created:' + event.htmlLink);
 		});
   }
   
@@ -203,12 +203,13 @@
       var API_KEY = 'AIzaSyDUI8cEkEtHgW8QV2MW551e_k3SocX-EOw';
 
       // Array of API discovery doc URLs for APIs used by the quickstart
-      var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+     /*  var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"]; */
+var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 
       // Authorization scopes required by the API; multiple scopes can be
       // included, separated by spaces.
-      var SCOPES ="https://www.googleapis.com/auth/calendar";
-
+      /* var SCOPES ="https://www.googleapis.com/auth/calendar"; */
+var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
       var signoutButton = document.getElementById('signout_button');
 
       /**
